@@ -1,0 +1,170 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[table]{xcolor}
+\usepackage[ruled]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{amsmath,boxedminipage}
+\usepackage{amssymb}
+\usepackage[totalwidth=166mm,totalheight=240mm]{geometry}
+
+\parindent0mm
+%\pagestyle{empty}
+
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\newcommand{\bigoh}{\mathcal{O}}
+\newcommand{\PP}{\mathcal{P}}
+\newcommand{\avg}{\textrm{avg}}
+\newcommand{\nop}[1]{}
+\newcommand{\var}{\textrm{var}}
+\newcommand{\E}{\textrm{E}}
+\newcounter{aufgc}
+\newenvironment{exercise}[1]%
+{\refstepcounter{aufgc}\textbf{Exercise \arabic{aufgc}} \emph{#1}\\}
+{
+	
+	\hrulefill\medskip}%
+
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+%\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}%[section]
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+
+%\newcommand{\solution}[1]{\bigskip \paragraph{Solution} #1}
+\newcommand{\solution}[1]{}
+
+\begin{document}
+
+%% Header
+\begin{minipage}[b]{0.58\textwidth}
+	\centering
+	\large
+	School of Computer Science and Technology\\University of Science and Technology of China
+\end{minipage}
+% \hfill
+% \begin{minipage}[b]{0.2\textwidth}
+%  \raggedleft
+%   \includegraphics[scale=0.2]{images_ue/tulogo}
+% \end{minipage}
+
+\hrulefill
+
+\vspace{0.2cm}
+\begin{center}
+	{\large \bf Exercise Sheet 1 for \\[1mm]
+		Design and Analysis of Algorithms\\[0.5mm]
+		Autumn 2022}\\
+	\textcolor{red}{Due 1 Oct 2022 at 23:59}
+	\bigskip
+
+	%  {\large Exercise Sheet 1   
+	%}
+	%\\
+
+	% \medskip
+\end{center}
+\vspace{0.1cm}
+
+
+
+\hrulefill\medskip
+%% Enter here the exercises !!
+
+
+\newcommand{\Alg}{\ensuremath{\mathcal{A}}}
+
+
+
+\begin{exercise}{}
+
+	Suppose you have an unfair dice such that if you roll it, the probability that each odd number (i.e., $1,3,5$) appears on the top is $\frac{1}{12}$, and the probability that each even number (i.e., $2,4,6$) appears on the top is $\frac{1}{4}$.
+
+	(1) Suppose that you roll this dice exactly once.
+	\begin{itemize}
+		\item What is the expected value of the number $X$ on top of the dice?
+		\item What is the variance of $X$?
+	\end{itemize}
+
+
+
+	(2) Suppose that you roll this dice $n$ times. Let $Y$ denote the sum of the numbers that are on the top of the dice throughout all the $n$ rolls.
+	\begin{itemize}
+		\item What is the expected value of $Y$?
+		\item What is the variance of $Y$?
+		\item Give an upper bound of $\Pr[Y> 4n]$ by using Markov inequality.
+		\item Give an upper bound of $\Pr[Y> 4n]$ by using Chebyshev's inequality.
+		\item Give an upper bound of $\Pr[Y> 4n]$ by using Chernoff Bound.
+	\end{itemize}
+
+	\textbf{Solution:} 
+	\begin{itemize}
+		\item  $E(X)=(1+3+5)/12+(2+4+6)/4 = 3.75$
+		\item  $Var(X)= E(X^2) - (E(X)^2) = (1+9+25)/12+(4+16+36)/4-3.75^2=2.85$
+		\item  Because of the Y is the sum of n independent variables, $E(Y)=nE(X) = 3.75n$
+		\item  $Var(Y)=nVar(X) = 2.85n$
+		\item  $Pr(Y>4n) \le Pr(Y \ge 4n) = Pr(Y \ge tE(Y)) \le \frac{1}{t}$, set $3.75nt=4n$, $t=\frac{16}{15}$, so we can get $Pr(Y>4n) \le \frac{15}{16} = 0.94$.
+		\item  $Pr(Y>4n) \le Pr(|Y-3.75n| \ge 0.25n) = Pr(|Y-E(Y)| \ge t\sqrt{Var(Y)}) \le \frac{1}{t^2}$, set $t\sqrt{2.85n}=0.25n$ \\
+		      $ \frac{1}{t^2 }= 2.85/(0.25^2n)=45.6/n$, so we can get $Pr(Y>4n) \le \frac{45.6}{n}$
+		\item  $Pr(Y>4n) \le Pr(|Y-3.75n| \ge 0.25n) = Pr(|Y-E(Y)| \ge \delta E(Y)) \le 2\exp(\frac{-E(Y) \cdot \delta^2 }{3})$,\\
+		      set $3.75n\delta=0.25n$, $\delta = 0.07$, so we can get $Pr(Y>4n) \le 2\exp(\frac{-3.75n \cdot0.0049 }{3}) = 2\exp(-0.0030625n)$
+	\end{itemize}
+
+
+\end{exercise}
+
+\begin{exercise}{(An application of Markov's inequality: turning a Las Vegas algorithm to a Monte Carlo algorithm)}
+
+	Let $\Alg$ be a randomized algorithm for some decision problem $P$ (e.g., to decide if a graph is connected or not). Suppose that for any given instance of $P$ of size $n$, $\Alg$ runs in \emph{expected} $T(n)$ time and always outputs the correct answer.
+
+	Use $\Alg$ to give a new randomized algorithm $\textsc{NewAlg}$ for the problem $P$ such that $\textsc{NewAlg}$ \emph{always} runs in $100 T(n)$ time and
+	\begin{itemize}
+		\item if the input is a `Yes' instance\footnote{An instance is a `Yes'-instance if the correct answer to the Problem is `Yes'. Otherwise (the correct answer is `No'), it is a `No'-instance. }, then it will be accepted with probability at least $\frac56$;
+		\item if the input is a `No' instance, then it will always be rejected.
+	\end{itemize}
+	Describe your algorithm and justify its correctness and running time.
+
+	\vspace{1em}
+	\textbf{Hint:} You may use Markov's inequality.\\
+
+	\textbf{Solution:} \\
+
+	Consider the algorithm ($\textsc{NewAlg}$): run the $\Alg$ for $t$ steps, and if it has not stopped yet, just abort it.  \\
+
+	If the input is a `No' instance, then it will always be rejected obviously.
+
+	If the input is a `Yes' instance, consider the probability of accepted a answer is at least: if the running time of $\Alg$ is $T$, we can use Markov's inequality to get
+	$Pr(T < t) = 1 - Pr(T\ge t) \ge 1-\frac{E\Alg}{t} = 1-\frac{T(n)}{t}$,
+
+	$\because Pr(T < t) \ge \frac{5}{6} \therefore 1-\frac{T(n)}{t} = \frac{5}{6} \therefore t=6T(n)$.
+	So we just run the $\Alg$ at least for $6T(n)$ steps which is smaller than $100T(n)$, we can ensure the accepted probability is at least  $\frac56$.
+
+
+
+\end{exercise}
+
+\begin{exercise}{}
+	Take $R$ to be the IQ of a random person you pull off the street. What is the probability that some's IQ is at least $200$ given that the average IQ is $100$ and the variance of $R$ is $100$? \\
+
+
+	\textbf{Solution:} 
+	\begin{itemize}
+		\item Using Markov's inequality: $Pr(IQ \ge 200) = Pr(IQ \ge tE(IQ)) \le \frac{1}{t}$, set $tE(IQ) = 200$, $t=2$, so we can get $Pr(IQ \ge 200) \le \frac12$
+		\item Using Chebyshev inequality: $Pr(IQ \ge 200) \le Pr(|IQ - 100| \ge 100) = Pr(|IQ - E(IQ)| \ge t\sqrt{Var(IQ)}) \le \frac{1}{t^2}$,
+		 set $t\sqrt{Var(IQ)}=100$, $t=10$, so we can get $Pr(IQ \ge 200) \le \frac{1}{100}$
+	\end{itemize}
+
+
+\end{exercise}
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
